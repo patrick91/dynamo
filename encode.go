@@ -65,7 +65,7 @@ func marshalStruct(rv reflect.Value) (map[string]*dynamodb.AttributeValue, error
 		case name == "-":
 			continue
 		case omitempty:
-			if isZero(fv) {
+			if fv == nil || isZero(fv) {
 				continue
 			}
 		}
