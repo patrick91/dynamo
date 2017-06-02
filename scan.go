@@ -56,6 +56,13 @@ func (s *Scan) Filter(expr string, args ...interface{}) *Scan {
 	return s
 }
 
+// Limit ...
+func (s *Scan) Limit(limit int64) *Scan {
+	s.limit = limit
+
+	return s
+}
+
 // Consistent will, if on is true, make this scan use a strongly consistent read.
 // Scans are eventually consistent by default.
 // Strongly consistent reads are more resource-heavy than eventually consistent reads.
@@ -145,6 +152,12 @@ func (itr *scanIter) Next(out interface{}) bool {
 	if itr.input == nil {
 		itr.input = itr.scan.scanInput()
 	}
+
+	// stop if exceed limit
+	if itr.output != nil && itr.input.Limit != nil && int(*itr.input.Limit) == itr.idx {
+		return false
+	}
+
 	if itr.output != nil && itr.idx >= len(itr.output.Items) {
 		// have we exhausted all results?
 		if itr.output.LastEvaluatedKey == nil {
